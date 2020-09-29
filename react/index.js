@@ -26,7 +26,7 @@ export default class AdvanceLocalColumns extends Component {
     const { pokemon, comments } = this.state;
 
     return (
-      <div>
+      <article>
         <h1 className="pageHeading">Advance Local React Component</h1>
 
         <main className="columns">
@@ -92,7 +92,7 @@ export default class AdvanceLocalColumns extends Component {
             </div>
           )}
         </main>
-      </div>
+      </article>
     );
   }
 
