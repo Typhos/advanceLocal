@@ -283,7 +283,12 @@
         let pokeArray = [];
 
         fetch(pokeApiCallURL)
-          .then((response) => response.json())
+          .then((response) => {
+            if (!response.ok) {
+              throw Error(response.statusText);
+            }
+            return response.json();
+          })
           .then(async (allPokemon) => {
             allPokemon.results.forEach((pokemon, index, array) => {
               pokeArray.push(fetch(pokemon.url).then((response) => response.json()));
@@ -292,7 +297,8 @@
             await Promise.all(pokeArray).then((data) => {
               callback(data);
             });
-          });
+          })
+          .catch((err) => console.error("Fetch Error: " + err));
       }
     }
 
@@ -300,7 +306,12 @@
       const commentURL = "https://jsonplaceholder.typicode.com/comments";
 
       fetch(commentURL)
-        .then((response) => response.json())
+        .then((response) => {
+          if (!response.ok) {
+            throw Error(response.statusText);
+          }
+          return response.json();
+        })
         .then((comments) => {
           let i = 0;
 
@@ -309,7 +320,8 @@
             renderComment(comments[i]);
             i++;
           }
-        });
+        })
+        .catch((err) => console.error("Fetch Error: " + err));
 
       function renderComment(comment) {
         const { body, email, id, name, postId } = comment;

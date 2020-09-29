@@ -101,7 +101,12 @@ export default class AdvanceLocalColumns extends Component {
     let pokeArray = [];
 
     fetch(`https://pokeapi.co/api/v2/pokemon?limit=${numberOfPokemonToShow}&offset=0`)
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw Error(response.statusText);
+        }
+        return response.json();
+      })
       .then(async (allPokemon) => {
         allPokemon.results.forEach((pokemon, index, array) => {
           pokeArray.push(fetch(pokemon.url).then((response) => response.json()));
@@ -110,16 +115,23 @@ export default class AdvanceLocalColumns extends Component {
         await Promise.all(pokeArray).then((data) => {
           this.setState({ pokemon: data });
         });
-      });
+      })
+      .catch((err) => console.error("Fetch Error: " + err));
   }
 
   getCommentData() {
     const { numberOfCommentsToShow } = this.state;
 
     fetch("https://jsonplaceholder.typicode.com/comments")
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw Error(response.statusText);
+        }
+        return response.json();
+      })
       .then((comments) => {
         this.setState({ comments: comments.slice(0, numberOfCommentsToShow - 1) });
-      });
+      })
+      .catch((err) => console.error("Fetch Error: " + err));
   }
 }
