@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Advance Local Vanilla Javascript</title>
+
+    <style>
+      .heading {
+        font-family: "Lucida Sans", Geneva, Verdana, sans-serif;
+        color: #333;
+        width: 66%;
+        max-width: 1000px;
+        margin: 0 auto 40px;
+      }
+
+      .columns {
+        display: flex;
+        justify-content: space-between;
+        width: 66%;
+        max-width: 1000px;
+        margin: 0 auto;
+      }
+
+      .columns__columnHeading {
+        font-family: "Lucida Sans", Geneva, Verdana, sans-serif;
+        color: #ccddff;
+        margin: 0 0 0.5em;
+        padding: 0.5em 1em;
+        background-color: #222;
+      }
+
+      .columns__column {
+        display: inline-block;
+        width: 48%;
+      }
+
+      .columns__list {
+        padding: 0;
+      }
+
+      .pokemon,
+      .comment {
+        list-style-type: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-evenly;
+        background-color: #e6e6e6;
+        margin: 0 0 10px;
+        padding: 5px 8px;
+      }
+
+      .pokemon {
+        border-radius: 1em 0 0 1em;
+      }
+
+      .pokemon[data-type="normal"] {
+        border-right: 10px solid #ccc9aa;
+      }
+
+      .pokemon[data-type="fire"] {
+        border-right: 10px solid #f67f0b;
+      }
+
+      .pokemon[data-type="water"] {
+        border-right: 10px solid #0a7abc;
+      }
+
+      .pokemon[data-type="grass"] {
+        border-right: 10px solid #3e9709;
+      }
+
+      .pokemon[data-type="flying"] {
+        border-right: 10px solid #075764;
+      }
+
+      .pokemon[data-type="bug"] {
+        border-right: 10px solid #bddd6e;
+      }
+
+      .pokemon[data-type="poison"] {
+        border-right: 10px solid #a719d7;
+      }
+
+      .pokemon[data-type="ice"] {
+        border-right: 10px solid #1995a1;
+      }
+
+      .pokemon[data-type="fighting"] {
+        border-right: 10px solid #e81318;
+      }
+
+      .pokemon[data-type="electric"] {
+        border-right: 10px solid #969101;
+      }
+
+      .pokemon[data-type="rock"] {
+        border-right: 10px solid #776a3e;
+      }
+
+      .pokemon[data-type="ground"] {
+        border-right: 10px solid #bfac21;
+      }
+
+      .pokemon[data-type="ghost"] {
+        border-right: 10px solid #472b53;
+      }
+
+      .pokemon[data-type="psychic"] {
+        border-right: 10px solid #ec0e63;
+      }
+
+      .pokemon[data-type="dragon"] {
+        border-right: 10px solid #29036a;
+      }
+
+      .pokemon[data-type="fairy"] {
+        border-right: 10px solid #ff9fc2;
+      }
+
+      .pokemon__rightBlock {
+        width: 50%;
+      }
+
+      .pokemon__name {
+        text-transform: uppercase;
+        font-family: Helvetica, sans-serif;
+        font-size: 16px;
+        display: inline-block;
+        margin: 0;
+      }
+
+      .pokemon__number {
+        font-family: Helvetica, sans-serif;
+        font-size: 12px;
+        color: #0066aa;
+        display: inline-block;
+        margin: 0 0.5em;
+      }
+
+      .pokemon__image {
+        display: inline-block;
+      }
+
+      .pokemon__typesList {
+        margin-top: 10px;
+      }
+
+      .pokemon__typesListItem {
+        line-height: 1.66em;
+        font-family: Helvetica, sans-serif;
+        font-size: 12px;
+        font-variant: small-caps;
+      }
+
+      /* == Comment Styling == */
+
+      .comment {
+        border-radius: 0 1em 1em 0;
+        display: block;
+        font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+        font-size: 12px;
+        padding: 0.66rem 0.5rem;
+      }
+
+      .comment__userName {
+        display: block;
+        font-size: 1rem;
+        font-weight: 700;
+        color: #333;
+        margin: 0 0 0.5rem;
+      }
+
+      .comment__userId {
+        margin-left: 1em;
+        font-size: 11px;
+        color: #676;
+      }
+
+      .comment__userEmail {
+        text-transform: uppercase;
+        letter-spacing: 0.066em;
+        margin: 0;
+        font-size: 11px;
+        color: #444;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      .comment__body {
+        line-height: 1.66em;
+        display: inline-block;
+        font-size: 12px;
+        color: #113;
+        margin: 0.5rem 0 0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1 class="heading">Advance Local Vanilla Javascript</h1>
+    <main class="columns">
+      <div class="columns__column">
+        <h2 class="columns__columnHeading">Kanto Pokemon</h2>
+        <ul id="pokeList" class="columns__list"></ul>
+      </div>
+      <div class="columns__column">
+        <h2 class="columns__columnHeading">Top Comments</h2>
+        <ul id="commentList" class="columns__list"></ul>
+      </div>
+    </main>
+  </body>
+
+  <script>
+    // Using ES6 as it is supported by 97.11% of all browsers, https://caniuse.com/es6.
+    // If this were a commercial site, polyfill with babel, or some other option would cover all scenarios.
+
+    // Let's get the OG Kanto Pokemon!
+    buildPokemonColumn(151);
+
+    // How many comments to display? Let's not do 500. How about 25?
+    buildCommentsList(25);
+
+    function buildPokemonColumn(pokemonCount) {
+      const pokeApiCallURL = `https://pokeapi.co/api/v2/pokemon?limit=${pokemonCount}&offset=0`;
+
+      fetchPokemonData((pokeData) => {
+        pokeData.forEach((pokemon) => renderPokeList(pokemon));
+      });
+
+      function renderPokeList(pokemon) {
+        let list = document.getElementById("pokeList");
+
+        // list item
+        let listItem = document.createElement("li");
+        listItem.classList = "pokemon";
+
+        // name as h2
+        let name = document.createElement("h2");
+        name.innerText = pokemon.name;
+        name.classList = "pokemon__name";
+
+        // id as pokeNumber
+        let id = document.createElement("sup");
+        id.innerText = "# " + pokemon.id;
+        id.classList = "pokemon__number";
+
+        // front-facing sprite
+        let image = document.createElement("img");
+        image.srcset = pokemon.sprites.front_default;
+        image.classList = "pokemon__image";
+
+        // type list
+        let typesList = document.createElement("ul");
+        typesList.classList = "pokemon__typesList";
+        pokemon.types.forEach((type, i, fullArray) => {
+          let li = document.createElement("li");
+          li.innerText = type.type.name;
+          li.classList = "pokemon__typesListItem";
+          typesList.append(li);
+
+          if (i === 0) setPokemonMainType(type);
+        });
+
+        let rightSideDiv = document.createElement("div");
+        rightSideDiv.classList = "pokemon__rightBlock";
+        rightSideDiv.append(name, id, typesList);
+
+        listItem.append(image, rightSideDiv);
+
+        list.appendChild(listItem);
+
+        function setPokemonMainType(typeObj) {
+          const {
+            type: { name },
+          } = typeObj;
+
+          listItem.dataset.type = name;
+        }
+      }
+
+      function fetchPokemonData(callback) {
+        // makes a request for the list of Pokemon fro pokeApiCallURL and then builds an array of URIs to call based on the response.
+        let pokeArray = [];
+
+        fetch(pokeApiCallURL)
+          .then((response) => response.json())
+          .then(async (allPokemon) => {
+            allPokemon.results.forEach((pokemon, index, array) => {
+              pokeArray.push(fetch(pokemon.url).then((response) => response.json()));
+            });
+
+            await Promise.all(pokeArray).then((data) => {
+              callback(data);
+            });
+          });
+      }
+    }
+
+    function buildCommentsList(displayCount) {
+      const commentURL = "https://jsonplaceholder.typicode.com/comments";
+
+      fetch(commentURL)
+        .then((response) => response.json())
+        .then((comments) => {
+          let i = 0;
+
+          // simple while loop to only present the top comments.
+          while (i < displayCount) {
+            renderComment(comments[i]);
+            i++;
+          }
+        });
+
+      function renderComment(comment) {
+        const { body, email, id, name, postId } = comment;
+
+        let list = document.getElementById("commentList");
+
+        // list item
+        let listItem = document.createElement("li");
+        listItem.classList = "comment";
+
+        let userName = document.createElement("h3");
+        userName.classList = "comment__userName";
+        userName.innerText = name;
+
+        let userEmail = document.createElement("p");
+        userEmail.classList = "comment__userEmail";
+        userEmail.innerText = email;
+
+        let commentBody = document.createElement("p");
+        commentBody.classList = "comment__body";
+        commentBody.innerText = body;
+
+        listItem.append(userName, userEmail, commentBody);
+        list.appendChild(listItem);
+      }
+    }
+  </script>
+</html>
